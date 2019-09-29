@@ -1,0 +1,22 @@
+{
+  "name": "z_door_sensor",
+  "version": "1.0.0",
+  "description": "Logs door open/close events and send a push notification to master",
+  "main": "index.js",
+  "author": "ZoneSix <areazone6@gmail.com>",
+  "license": "WTFPL",
+  "dependencies": {
+    "human-elapsed": "^1.0.3",
+    "mariadb": "^2.1.1",
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.26",
+    "net-ping": "^1.2.3",
+    "node-fetch": "^2.6.0",
+    "rpio": "git+https://github.com/KryQ/node-rpio.git",
+    "sequelize": "^5.19.1"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "sync": "node db_init.js"
+  }
+}
