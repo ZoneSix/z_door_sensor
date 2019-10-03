@@ -45,8 +45,6 @@ const initialize = () => {
     mapping: 'physical', // Use the P1-P40 numbering scheme
   })
 
-  moment.tz.setDefault(TIMEZONE)
-
   pollDoor()
 
   console.info('Door Sensor is running.')
@@ -76,8 +74,8 @@ const handleChangedState = (currentState) => {
   const timeDelta = msToSeconds(timeStamp.valueOf() - door.lastStateTimeStamp.valueOf())
 
   const humanTime = {
-    date: timeStamp.format(DATE_FORMAT),
-    time: timeStamp.format(TIME_FORMAT),
+    date: timeStamp.tz(TIMEZONE).format(DATE_FORMAT),
+    time: timeStamp.tz(TIMEZONE).format(TIME_FORMAT),
     delta: humanElapsed(timeDelta),
   }
 
@@ -140,7 +138,7 @@ const handleDoorClose = async (param) => {
 const logToDB = (param) => {
   Log.create({
     event: param.event,
-    eventTime: param.timeStamp.format('Y-MM-DD HH:mm:ssZ'),
+    eventTime: param.timeStamp.tz(TIMEZONE).format('Y-MM-DD HH:mm:ssZ'),
     eventTimeUNIX: param.timeStamp.valueOf(),
     phoneConnected: param.phoneOnNetwork,
   }).catch(error => {
