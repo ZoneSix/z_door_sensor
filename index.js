@@ -38,6 +38,8 @@ const door = {
 const msToSeconds = (milliseconds) => Math.round(milliseconds / 1000)
 
 const initialize = () => {
+  console.info('Starting Door Sensor...')
+
   rpio.init({
     gpiomem: false, // Use /dev/gpiomem
     mapping: 'physical', // Use the P1-P40 numbering scheme
@@ -46,6 +48,8 @@ const initialize = () => {
   moment.tz.setDefault(TIMEZONE)
 
   pollDoor()
+
+  console.info('Door Sensor is running.')
 }
 
 const pollDoor = () => {
