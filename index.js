@@ -54,6 +54,19 @@ const pollDoor = () => {
   rpio.open(DOORSWITCH, rpio.INPUT, rpio.PULL_UP) // Setup pin for input
   door.lastState = rpio.read(DOORSWITCH) // Store the current state
   door.lastStateTimeStamp = moment() // Store the current timestamp
+  const firstTimeStamp = door.lastStateTimeStamp
+
+  // Get the latest state and timestamp from log
+  Log.findOne({
+    order: [
+      ['eventTimeUNIX', 'DESC'],
+    ],
+  }).then(entry => {
+    if (entry && door.lastStateTimeStamp.valueOf() === firstTimeStamp.valueOf()) {
+      door.lastStateTimeStamp = moment(entry.eventTimeUNIX)
+    }
+  })
+
   // Run polling clock
   door.pollInterval = setInterval(checkDoorState, POLLINTERVAL)
 }
