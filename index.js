@@ -63,7 +63,7 @@ const pollDoor = () => {
     ],
   }).then(entry => {
     if (entry && door.lastStateTimeStamp.valueOf() === firstTimeStamp.valueOf()) {
-      door.lastStateTimeStamp = moment(entry.eventTimeUNIX)
+      door.lastStateTimeStamp = moment(parseInt(entry.eventTimeUNIX, 10))
     }
   })
 
