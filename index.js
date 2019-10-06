@@ -118,7 +118,7 @@ const handleChangedState = (currentState) => {
   humanTime.dateTime = `${humanTime.date} at ${humanTime.time}`
 
   // Set last state timestamp
-  door.lastStateTimeStamp = timeStamp;
+  door.lastStateTimeStamp = timeStamp
 
   if (currentState) {
     handleDoorOpen({ timeStamp, timeDelta, humanTime })
@@ -238,7 +238,7 @@ const sendNotification = (message) => {
   })
   .then(res => {
     if (res.status === 200) {
-      return res.json();
+      return res.json()
     }
 
     console.error('Failed to send notification!\n', res.statusText)
@@ -246,11 +246,12 @@ const sendNotification = (message) => {
   .then(json => {
     if (json.error || !json.iden) {
       console.error('Failed to send notification!\n', json)
-      return;
+      return
     }
 
     console.log('Notification sent!')
-  });
+  })
+}
 
 const startCapture = (timeStamp) => {
   const time = timeStamp.tz(TIMEZONE).format('Y-MM-DD-HH-mm-ss')
