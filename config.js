@@ -6,6 +6,7 @@ module.exports = {
   TIMEZONE: 'Europe/Stockholm',
   DATE_FORMAT: 'ddd, Do MMM Y',
   TIME_FORMAT: 'HH:mm:ss z',
+
   DB: {
     HOST: '127.0.0.1',
     NAME: 'z_door_sensor',
@@ -13,5 +14,15 @@ module.exports = {
     PASSWORD: 'password',
     DIALECT: 'mariadb',
     TIMEZONE: 'Etc/GMT0',
+  },
+
+  CAMERA: {
+    SAVEDIR: './captures',
+    WIDTH: 1280,
+    HEIGHT: 960,
+    QUALITY: 95,
+    OUTPUT: 'jpeg',
+    DURATION: 300000,
+    DELAY: 5000,
   },
 }

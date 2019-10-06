@@ -3,6 +3,8 @@ const moment = require('moment-timezone')
 const humanElapsed = require('human-elapsed')
 const fetch = require('node-fetch')
 const ping = require('net-ping')
+const nodeWebcam = require('node-webcam')
+const fs = require('fs')
 
 const { Log } = require('./database')
 
@@ -17,6 +19,7 @@ const {
   DATE_FORMAT,
   TIME_FORMAT,
   IPV6_TARGET,
+  CAMERA,
 } = config
 
 // Setup the network ping session
@@ -28,6 +31,26 @@ const netSession = ping.createSession({
     timeout: 2000,
     ttl: 128,
 })
+
+// Setup camera
+const camera = nodeWebcam.create({
+  width: CAMERA.WIDTH,
+  height: CAMERA.HEIGHT,
+  quality: CAMERA.QUALITY,
+  delay: 0,
+  saveShots: false,
+  output: CAMERA.OUTPUT,
+  device: false,
+  callbackReturn: 'buffer',
+  verbose: false,
+})
+
+const cameraData = {
+  timer: null,
+  location: null,
+  count: 0,
+  target: CAMERA.DURATION / CAMERA.DELAY,
+}
 
 const door = {
   lastState: null,
@@ -105,11 +128,17 @@ const handleChangedState = (currentState) => {
 }
 
 const handleDoorOpen = async (param) => {
+  startCapture(param.timeStamp)
+
   let consolePrint = `${param.humanTime.dateTime}: Door opened!\n`
   consolePrint += `Door was closed for ${param.humanTime.delta}`
   console.log(consolePrint)
 
   const phoneOnNetwork = await checkNetworkForPhone()
+
+  if (!phoneOnNetwork) {
+    abortCapture()
+  }
 
   logToDB({
     event: 'DOOR_OPEN',
@@ -222,6 +251,71 @@ const sendNotification = (message) => {
 
     console.log('Notification sent!')
   });
+
+const startCapture = (timeStamp) => {
+  const time = timeStamp.tz(TIMEZONE).format('Y-MM-DD-HH-mm-ss')
+  const path = `${CAMERA.SAVEDIR}/event-${time}`
+
+  cameraData.location = path
+  cameraData.count = 0
+
+  // Clear timer if any
+  if (cameraData.timer) {
+    clearTimeout(cameraData.timer)
+  }
+
+  capture(timeStamp)
+}
+
+const capture = (timeStamp = null) => {
+  const time = timeStamp
+    ? timeStamp.tz(TIMEZONE).format('Y-MM-DD-HH-mm-ss')
+    : moment().tz(TIMEZONE).format('Y-MM-DD-HH-mm-ss')
+  const path = cameraData.location ? cameraData.location : `${CAMERA.SAVEDIR}/event-${time}`
+  const file = `capture-${time}`
+  const completePath = `${path}/${file}.${CAMERA.OUTPUT}`
+
+  camera.capture(file, (error, buffer) => {
+    if (error) {
+      console.error(error)
+      return
+    }
+
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path, {
+        recursive: true,
+      })
+    }
+
+
+    fs.writeFile(completePath, buffer, (error) => {
+      if (error) {
+        console.error(error)
+        return
+      }
+
+      console.info(`Capture saved to ${completePath}`)
+      cameraData.count += 1
+    })
+  })
+
+  if (cameraData.count < cameraData.target) {
+    cameraData.timer = setTimeout(capture, CAMERA.DELAY)
+  }
+}
+
+const abortCapture = () => {
+  if (cameraData.timer) {
+    clearTimeout(cameraData.timer)
+  }
+
+  if (cameraData.location) {
+    fs.rmdir(cameraData.location, {
+      recursive: true,
+    }, (error) => {
+      console.error(error)
+    })
+  }
 }
 
 initialize()
