@@ -136,7 +136,7 @@ const handleDoorOpen = async (param) => {
 
   const phoneOnNetwork = await checkNetworkForPhone()
 
-  if (!phoneOnNetwork) {
+  if (phoneOnNetwork) {
     abortCapture()
   }
 
