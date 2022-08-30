@@ -9,7 +9,7 @@
     "human-elapsed": "^1.0.3",
     "mariadb": "^2.1.1",
     "moment": "^2.24.0",
-    "moment-timezone": "^0.5.26",
+    "moment-timezone": "^0.5.35",
     "net-ping": "^1.2.3",
     "node-fetch": "^2.6.0",
     "node-webcam": "^0.5.0",
